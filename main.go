@@ -1,7 +1,7 @@
 package main
 
 import (
-	"ImageSpirit/cmd"
+	"ImageScript/cmd"
 )
 
 func main() {
