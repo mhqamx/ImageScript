@@ -1,10 +1,10 @@
 package info
 
 // Version 软件版本
-const Version = "0.0.1"
+const Version = "1.0.0"
 
 // Author 作者
-const Author = "Arror"
+const Author = "Arrors"
 
 // Email 作者电子邮件
 const Email = "763911422@qq.com"
