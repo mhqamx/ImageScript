@@ -2,12 +2,11 @@
 ##Usage:
 
 ####Command:
-
-*命令： resize*
-
-*例子：./ImageScript r -i ./icon.png -o ./Icons*
-
+    命令： resize
+    例子：./ImageScript r -i ./icon.png -o ./Icons
+------------------------------------------------------------------
 ![](https://github.com/Arrors/ImageScript/blob/master/usage.gif)
+------------------------------------------------------------------
 
 ####Update:
     1.支持任意文件夹输出；
