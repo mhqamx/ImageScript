@@ -1,7 +1,7 @@
 package info
 
 // Version 软件版本
-const Version = "1.0.0"
+const Version = "1.0.1"
 
 // Author 作者
 const Author = "Arrors"
