@@ -9,6 +9,7 @@ import (
 // ImageResizeInfo 命令信息结构
 type ImageResizeInfo struct {
 	Input         string
+	Output        string
 	Dir           string
 	File          string
 	FileName      string
@@ -45,6 +46,13 @@ func (info *ImageResizeInfo) InitAndValidityOfImageResizeInfo() error {
 	}
 
 	info.Input = p
+	p, err = filepath.Abs(info.Output)
+
+	if err != nil {
+		info.Output = "./"
+	} else {
+		info.Output = p
+	}
 	info.File = file
 	info.FileName = components[0]
 	info.FileExtension = components[1]

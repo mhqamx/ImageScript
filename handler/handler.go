@@ -2,8 +2,10 @@ package handler
 
 import (
 	"fmt"
+	"image"
 	"image/png"
 	"os"
+	"sync"
 
 	"ImageScript/validity"
 
@@ -18,7 +20,7 @@ type IconInfo struct {
 	Multiply    uint
 }
 
-var iconInfos = []*IconInfo{
+var iPhoneInfos = []*IconInfo{
 	&IconInfo{
 		DeviceName:  "iPhone Spotlight(iOS 5-6) Settings(iOS 5-9)",
 		BaseWidth:   29.0,
@@ -55,6 +57,9 @@ var iconInfos = []*IconInfo{
 		BasegHeight: 60.0,
 		Multiply:    3,
 	},
+}
+
+var iPadInfos = []*IconInfo{
 	&IconInfo{
 		DeviceName:  "iPad Setting(iOS 5-9)",
 		BaseWidth:   29.0,
@@ -97,6 +102,9 @@ var iconInfos = []*IconInfo{
 		BasegHeight: 83.5,
 		Multiply:    2,
 	},
+}
+
+var appleWatchInfos = []*IconInfo{
 	&IconInfo{
 		DeviceName:  "Apple Watch Notification Center 38mm",
 		BaseWidth:   24.0,
@@ -165,24 +173,65 @@ func IconResize(imageResizeInfo *validity.ImageResizeInfo) error {
 
 	img, err := png.Decode(file)
 
-	for _, info := range iconInfos {
-
-		w, h := info.UltimateImageSize()
-
-		fn := info.AssembleImageName()
-
-		m := resize.Resize(w, h, img, resize.Lanczos3)
-
-		out, err := os.Create(fn)
-
-		if err != nil {
-			return fmt.Errorf("创建图片出错\n错误信息：%s", err.Error())
-		}
-
-		defer out.Close()
-
-		png.Encode(out, m)
+	if err != nil {
+		return fmt.Errorf("图片文件解析失败\n错误信息：%s", err.Error())
 	}
 
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+	go func(img image.Image, infos []*IconInfo) {
+		defer wg.Done()
+		fp := fmt.Sprintf("%s%s", imageResizeInfo.Output, "/iPhone icons")
+		if err := os.MkdirAll(fp, 0755); err != nil {
+			panic("创建iPhone icons文件夹失败")
+		}
+		for _, info := range infos {
+			outputImage(img, fp, info)
+		}
+	}(img, iPhoneInfos)
+
+	wg.Add(1)
+	go func(img image.Image, infos []*IconInfo) {
+		defer wg.Done()
+		fp := fmt.Sprintf("%s%s", imageResizeInfo.Output, "/iPad icons")
+		if err := os.MkdirAll(fp, 0755); err != nil {
+			panic("创建iPhone icons文件夹失败")
+		}
+		for _, info := range infos {
+			outputImage(img, fp, info)
+		}
+	}(img, iPadInfos)
+
+	wg.Add(1)
+	go func(img image.Image, infos []*IconInfo) {
+		defer wg.Done()
+		fp := fmt.Sprintf("%s%s", imageResizeInfo.Output, "/Apple Watch icons")
+		if err := os.MkdirAll(fp, 0755); err != nil {
+			panic("创建iPhone icons文件夹失败")
+		}
+		for _, info := range infos {
+			outputImage(img, fp, info)
+		}
+	}(img, appleWatchInfos)
+
+	wg.Wait()
+
 	return nil
+}
+
+func outputImage(img image.Image, fp string, info *IconInfo) {
+
+	w, h := info.UltimateImageSize()
+	fn := info.AssembleImageName()
+	m := resize.Resize(w, h, img, resize.Lanczos3)
+	var path string
+	if fp != "" {
+		path = fmt.Sprintf("%s/%s", fp, fn)
+	}
+	out, err := os.Create(path)
+	if err != nil {
+		fmt.Println("构建失败：", path, err.Error())
+	}
+	defer out.Close()
+	png.Encode(out, m)
 }
