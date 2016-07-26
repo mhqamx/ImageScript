@@ -149,19 +149,6 @@ var appleWatchInfos = []*IconInfo{
 	},
 }
 
-// UltimateImageSize 计算resize之后图片实际大小
-func (info *IconInfo) UltimateImageSize() (width, height uint) {
-	return uint(info.BaseWidth * float32(info.Multiply)), uint(info.BasegHeight * float32(info.Multiply))
-}
-
-// AssembleImageName 拼接Image的名称
-func (info *IconInfo) AssembleImageName() string {
-
-	width, height := info.UltimateImageSize()
-	imageName := info.DeviceName
-	return fmt.Sprintf("%s_%dx%d_@%dx.png", imageName, width, height, info.Multiply)
-}
-
 // IconResize 转换输入的Icon
 func IconResize(imageResizeInfo *validity.ImageResizeInfo) error {
 
@@ -181,42 +168,48 @@ func IconResize(imageResizeInfo *validity.ImageResizeInfo) error {
 	wg.Add(1)
 	go func(img image.Image, infos []*IconInfo) {
 		defer wg.Done()
-		fp := fmt.Sprintf("%s%s", imageResizeInfo.Output, "/iPhone icons")
-		if err := os.MkdirAll(fp, 0755); err != nil {
-			panic("创建iPhone icons文件夹失败")
-		}
-		for _, info := range infos {
-			outputImage(img, fp, info)
-		}
+		assembleFilePathAndDistribute(img, infos, imageResizeInfo.Output, "/iPhone icons")
 	}(img, iPhoneInfos)
 
 	wg.Add(1)
 	go func(img image.Image, infos []*IconInfo) {
 		defer wg.Done()
-		fp := fmt.Sprintf("%s%s", imageResizeInfo.Output, "/iPad icons")
-		if err := os.MkdirAll(fp, 0755); err != nil {
-			panic("创建iPhone icons文件夹失败")
-		}
-		for _, info := range infos {
-			outputImage(img, fp, info)
-		}
+		assembleFilePathAndDistribute(img, infos, imageResizeInfo.Output, "/iPad icons")
 	}(img, iPadInfos)
 
 	wg.Add(1)
 	go func(img image.Image, infos []*IconInfo) {
 		defer wg.Done()
-		fp := fmt.Sprintf("%s%s", imageResizeInfo.Output, "/Apple Watch icons")
-		if err := os.MkdirAll(fp, 0755); err != nil {
-			panic("创建iPhone icons文件夹失败")
-		}
-		for _, info := range infos {
-			outputImage(img, fp, info)
-		}
+		assembleFilePathAndDistribute(img, infos, imageResizeInfo.Output, "/Apple Watch icons")
 	}(img, appleWatchInfos)
 
 	wg.Wait()
 
 	return nil
+}
+
+// UltimateImageSize 计算resize之后图片实际大小
+func (info *IconInfo) UltimateImageSize() (width, height uint) {
+	return uint(info.BaseWidth * float32(info.Multiply)), uint(info.BasegHeight * float32(info.Multiply))
+}
+
+// AssembleImageName 拼接Image的名称
+func (info *IconInfo) AssembleImageName() string {
+
+	width, height := info.UltimateImageSize()
+	imageName := info.DeviceName
+	return fmt.Sprintf("%s_%dx%d_@%dx.png", imageName, width, height, info.Multiply)
+}
+
+func assembleFilePathAndDistribute(img image.Image, infos []*IconInfo, outputPath string, deviceFolder string) {
+
+	fp := fmt.Sprintf("%s%s", outputPath, deviceFolder)
+	if err := os.MkdirAll(fp, 0755); err != nil {
+		panic(fmt.Sprintf("创建文件夹失败: %s", err.Error()))
+	}
+	for _, info := range infos {
+		outputImage(img, fp, info)
+	}
 }
 
 func outputImage(img image.Image, fp string, info *IconInfo) {
