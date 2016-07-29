@@ -8,15 +8,13 @@ import (
 
 // ImageResizeInfo 命令信息结构
 type ImageResizeInfo struct {
-	Input         string
-	Output        string
-	Dir           string
-	File          string
-	FileName      string
-	FileExtension string
-	IsHaveiPhone  bool
-	IsHaveiPad    bool
-	IsHaveiWatch  bool
+	Input           string
+	Output          string
+	Dir             string
+	File            string
+	FileName        string
+	FileExtension   string
+	PerferredDevice string
 }
 
 // InitAndValidityOfImageResizeInfo 检查输入命令合法性

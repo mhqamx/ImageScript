@@ -5,6 +5,7 @@ import (
 	"image"
 	"image/png"
 	"os"
+	"strings"
 	"sync"
 
 	"ImageScript/validity"
@@ -164,11 +165,15 @@ func IconResize(imageResizeInfo *validity.ImageResizeInfo) error {
 		return fmt.Errorf("图片文件解析失败\n错误信息：%s", err.Error())
 	}
 
+	iph := strings.Contains(strings.ToLower(imageResizeInfo.PerferredDevice), "iphone")
+	ipa := strings.Contains(strings.ToLower(imageResizeInfo.PerferredDevice), "ipad")
+	iwa := strings.Contains(strings.ToLower(imageResizeInfo.PerferredDevice), "iwatch")
+
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 	go func(img image.Image, infos []*IconInfo) {
 		defer wg.Done()
-		if imageResizeInfo.IsHaveiPhone {
+		if iph {
 			assembleFilePathAndDistribute(img, infos, imageResizeInfo.Output, "/iPhone icons")
 		}
 	}(img, iPhoneInfos)
@@ -176,7 +181,7 @@ func IconResize(imageResizeInfo *validity.ImageResizeInfo) error {
 	wg.Add(1)
 	go func(img image.Image, infos []*IconInfo) {
 		defer wg.Done()
-		if imageResizeInfo.IsHaveiPad {
+		if ipa {
 			assembleFilePathAndDistribute(img, infos, imageResizeInfo.Output, "/iPad icons")
 		}
 	}(img, iPadInfos)
@@ -184,7 +189,7 @@ func IconResize(imageResizeInfo *validity.ImageResizeInfo) error {
 	wg.Add(1)
 	go func(img image.Image, infos []*IconInfo) {
 		defer wg.Done()
-		if imageResizeInfo.IsHaveiWatch {
+		if iwa {
 			assembleFilePathAndDistribute(img, infos, imageResizeInfo.Output, "/Apple Watch icons")
 		}
 	}(img, appleWatchInfos)
