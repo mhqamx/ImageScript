@@ -14,6 +14,9 @@ type ImageResizeInfo struct {
 	File          string
 	FileName      string
 	FileExtension string
+	IsHaveiPhone  bool
+	IsHaveiPad    bool
+	IsHaveiWatch  bool
 }
 
 // InitAndValidityOfImageResizeInfo 检查输入命令合法性

@@ -168,19 +168,25 @@ func IconResize(imageResizeInfo *validity.ImageResizeInfo) error {
 	wg.Add(1)
 	go func(img image.Image, infos []*IconInfo) {
 		defer wg.Done()
-		assembleFilePathAndDistribute(img, infos, imageResizeInfo.Output, "/iPhone icons")
+		if imageResizeInfo.IsHaveiPhone {
+			assembleFilePathAndDistribute(img, infos, imageResizeInfo.Output, "/iPhone icons")
+		}
 	}(img, iPhoneInfos)
 
 	wg.Add(1)
 	go func(img image.Image, infos []*IconInfo) {
 		defer wg.Done()
-		assembleFilePathAndDistribute(img, infos, imageResizeInfo.Output, "/iPad icons")
+		if imageResizeInfo.IsHaveiPad {
+			assembleFilePathAndDistribute(img, infos, imageResizeInfo.Output, "/iPad icons")
+		}
 	}(img, iPadInfos)
 
 	wg.Add(1)
 	go func(img image.Image, infos []*IconInfo) {
 		defer wg.Done()
-		assembleFilePathAndDistribute(img, infos, imageResizeInfo.Output, "/Apple Watch icons")
+		if imageResizeInfo.IsHaveiWatch {
+			assembleFilePathAndDistribute(img, infos, imageResizeInfo.Output, "/Apple Watch icons")
+		}
 	}(img, appleWatchInfos)
 
 	wg.Wait()

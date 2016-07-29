@@ -15,6 +15,7 @@ var Resize = cli.Command{
 	ShortName: "r",
 	Usage:     "iOS icon 生成命令",
 	UsageText: "生成 iOS icon 尺寸的图片文件",
+	ArgsUsage: "input, output",
 	Flags: []cli.Flag{
 		cli.StringFlag{
 			Name:        "input, i",
@@ -26,8 +27,45 @@ var Resize = cli.Command{
 			Usage:       "文件输出路径，若不指定或者错误，输出路径为脚本所在路径",
 			Destination: &resizeInfo.Output,
 		},
+
+		//		cli.StringFlag{
+		//			Name:  "iph",
+		//			Value: "true",
+		//			Usage: "是否输出iPhone图片",
+		//		},
+		//		cli.StringFlag{
+		//			Name:  "ipa",
+		//			Value: "true",
+		//			Usage: "是否输出iPad图片",
+		//		},
+		//		cli.StringFlag{
+		//			Name:  "iwa",
+		//			Value: "true",
+		//			Usage: "是否输出iWatch图片",
+		//		},
+
+		//你说用上边的写法还是下边的写法  上面的不用写等号 下边的还要输等号...
+		cli.BoolTFlag{
+			Name:        "iph",
+			Usage:       "是否输出iPhone图片",
+			Destination: &resizeInfo.IsHaveiPhone,
+		},
+		cli.BoolTFlag{
+			Name:        "ipa",
+			Usage:       "是否输出iPad图片",
+			Destination: &resizeInfo.IsHaveiPad,
+		},
+		cli.BoolTFlag{
+			Name:        "iwa",
+			Usage:       "是否输出iWatch图片",
+			Destination: &resizeInfo.IsHaveiWatch,
+		},
 	},
 	Action: func(c *cli.Context) error {
+
+		//		resizeInfo.IsHaveiPhone = c.BoolT("iph")
+		//		resizeInfo.IsHaveiPad = c.BoolT("ipa")
+		//		resizeInfo.IsHaveiWatch = c.BoolT("iwa")
 
 		if err := resizeInfo.InitAndValidityOfImageResizeInfo(); err != nil {
 			return err
