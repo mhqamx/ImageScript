@@ -45,6 +45,8 @@ var Resize = cli.Command{
 		//		},
 
 		//你说用上边的写法还是下边的写法  上面的不用写等号 下边的还要输等号...
+		// 建议添加一个 PerferredDevice 字段到Info中, 还有最好是发Pull request或者Merge request吗? 这个我根本看不到啊
+		// GO中处理字符串还是挺方便的
 		cli.BoolTFlag{
 			Name:        "iph",
 			Usage:       "是否输出iPhone图片",
