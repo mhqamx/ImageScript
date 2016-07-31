@@ -17,6 +17,12 @@ var Resize = cli.Command{
 	UsageText: "生成 iOS icon 尺寸的图片文件",
 	Flags: []cli.Flag{
 		cli.StringFlag{
+			Name:        "device, d",
+			Usage:       "期望生成iocn的设备选项",
+			Value:       "phone, pad, watch, all",
+			Destination: &resizeInfo.PreferenceDevice,
+		},
+		cli.StringFlag{
 			Name:        "input, i",
 			Usage:       "icon 文件路径",
 			Destination: &resizeInfo.Input,

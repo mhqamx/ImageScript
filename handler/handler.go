@@ -164,39 +164,43 @@ func IconResize(imageResizeInfo *validity.ImageResizeInfo) error {
 		return fmt.Errorf("图片文件解析失败\n错误信息：%s", err.Error())
 	}
 
-	wg := sync.WaitGroup{}
-	wg.Add(1)
-	go func(img image.Image, infos []*IconInfo) {
-		defer wg.Done()
-		assembleFilePathAndDistribute(img, infos, imageResizeInfo.Output, "/iPhone icons")
-	}(img, iPhoneInfos)
+	wg := &sync.WaitGroup{}
 
-	wg.Add(1)
-	go func(img image.Image, infos []*IconInfo) {
-		defer wg.Done()
-		assembleFilePathAndDistribute(img, infos, imageResizeInfo.Output, "/iPad icons")
-	}(img, iPadInfos)
-
-	wg.Add(1)
-	go func(img image.Image, infos []*IconInfo) {
-		defer wg.Done()
-		assembleFilePathAndDistribute(img, infos, imageResizeInfo.Output, "/Apple Watch icons")
-	}(img, appleWatchInfos)
+	switch imageResizeInfo.PreferenceDevice {
+	case "phone":
+		render(img, iPhoneInfos, imageResizeInfo, "iPhone icons", wg)
+	case "pad":
+		render(img, iPadInfos, imageResizeInfo, "iPad icons", wg)
+	case "watch":
+		render(img, appleWatchInfos, imageResizeInfo, "Apple Watch icons", wg)
+	case "all":
+		render(img, iPhoneInfos, imageResizeInfo, "iPhone icons", wg)
+		render(img, iPadInfos, imageResizeInfo, "iPad icons", wg)
+		render(img, appleWatchInfos, imageResizeInfo, "Apple Watch icons", wg)
+	default:
+		return fmt.Errorf("发现未知设备信息")
+	}
 
 	wg.Wait()
 
 	return nil
 }
 
-// UltimateImageSize 计算resize之后图片实际大小
-func (info *IconInfo) UltimateImageSize() (width, height uint) {
+func render(img image.Image, info []*IconInfo, imageResizeInfo *validity.ImageResizeInfo, folder string, wg *sync.WaitGroup) {
+	wg.Add(1)
+	go func(img image.Image, infos []*IconInfo) {
+		defer wg.Done()
+		assembleFilePathAndDistribute(img, infos, imageResizeInfo.Output, fmt.Sprintf("/%s", folder))
+	}(img, info)
+}
+
+func (info *IconInfo) ultimateImageSize() (width, height uint) {
 	return uint(info.BaseWidth * float32(info.Multiply)), uint(info.BasegHeight * float32(info.Multiply))
 }
 
-// AssembleImageName 拼接Image的名称
-func (info *IconInfo) AssembleImageName() string {
+func (info *IconInfo) assembleImageName() string {
 
-	width, height := info.UltimateImageSize()
+	width, height := info.ultimateImageSize()
 	imageName := info.DeviceName
 	return fmt.Sprintf("%s_%dx%d_@%dx.png", imageName, width, height, info.Multiply)
 }
@@ -214,8 +218,8 @@ func assembleFilePathAndDistribute(img image.Image, infos []*IconInfo, outputPat
 
 func outputImage(img image.Image, fp string, info *IconInfo) {
 
-	w, h := info.UltimateImageSize()
-	fn := info.AssembleImageName()
+	w, h := info.ultimateImageSize()
+	fn := info.assembleImageName()
 	m := resize.Resize(w, h, img, resize.Lanczos3)
 	var path string
 	if fp != "" {
