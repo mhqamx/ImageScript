@@ -8,16 +8,23 @@ import (
 
 // ImageResizeInfo 命令信息结构
 type ImageResizeInfo struct {
-	Input         string
-	Output        string
-	Dir           string
-	File          string
-	FileName      string
-	FileExtension string
+	Input            string
+	Output           string
+	Dir              string
+	File             string
+	FileName         string
+	FileExtension    string
+	PreferenceDevice string
 }
 
 // InitAndValidityOfImageResizeInfo 检查输入命令合法性
 func (info *ImageResizeInfo) InitAndValidityOfImageResizeInfo() error {
+
+	deviceLower := strings.ToLower(info.PreferenceDevice)
+
+	if deviceLower == "" {
+		return fmt.Errorf("生成的Icon的Device信息为空")
+	}
 
 	if info.Input == "" {
 		return fmt.Errorf("Icon文件路径为空")
